@@ -1,0 +1,75 @@
+<!--===========================================================================
+  This is the build file for the Pentaho Redis Metastore Project
+  
+  This build file will use the subfloor.xml file as the default build
+  process and should only override the tasks that need to differ from
+  the common build file.
+  
+  See subfloor.xml for more details
+============================================================================-->
+<project name="Pentaho Redis Metastore" basedir="." default="dist"
+	xmlns:ivy="antlib:org.apache.ivy.ant" >
+	
+	<description>
+	  This build file is used to create the Pentaho Redis Metastore project
+		and works with the subfloor.xml file.
+	</description>
+
+	<!-- Import the common_build.xml file which contains all the default tasks -->	
+	<import file="build-res/subfloor-pkg.xml"/>
+
+	
+	<property name="lib.provided.dir" value="lib-provided" description="Ivy dependencies of 'provided' configuration are placed here"/>
+	  
+    <!--
+    AS STATED ABOVE, THE ONLY TASKS THAT SHOULD EXIST IN THIS BUILD FILE ARE
+    THE TASKS THAT NEED TO DIFFER FROM THE DEFAULT IMPLEMENTATION OF THE TASKS
+    FOUND IN subfloor.xml.
+  --> 
+	
+	<!-- Setup the compile classpath -->
+  <path id="classpath">
+    <fileset dir="${devlib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+  	<fileset dir="${lib.provided.dir}">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+	
+  <!--=======================================================================
+        create-dot-classpath
+ 
+        Creates the Eclipse .classpath file from the resolved
+        classpath from Ant.
+      ====================================================================-->
+  <target name="create-dot-classpath" depends="install-pentaho-ant-tasks,init">
+    <dot-classpath>
+      <!-- Include all lib dirs -->
+      <classpath>
+        <fileset dir="${devlib.dir}">
+          <include name="*.jar" />
+        </fileset>
+        <fileset dir="${testlib.dir}">
+          <include name="*.jar" />
+        </fileset>
+        <fileset dir="${lib.dir}">
+          <include name="*.jar" />
+        </fileset>
+      	<fileset dir="${lib.provided.dir}">
+          <include name="*.jar" />
+        </fileset>
+      </classpath>
+    </dot-classpath>
+  </target>
+	
+	<!-- Resolve provided dependencies to a separate directory -->
+	  <target name="resolve-default" depends="subfloor.resolve-default">
+	    <ivy:resolve file="${ivyfile}" conf="provided" />
+	    <ivy:retrieve conf="provided" pattern="${lib.provided.dir}/[module]-[revision](-[classifier]).[ext]" symlink="${ivy.use.symlinks.internal}" />
+	  </target>
+
+  </project>

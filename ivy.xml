@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+  <info organisation="pentaho" module="${ivy.artifact.id}" revision="${project.revision}" />
+
+  <configurations>
+    <conf name="default" />
+    <conf name="provided" />
+    <conf name="test" visibility="private" />
+    <conf name="source" />
+    <conf name="zip" />
+  </configurations>
+
+  <publications>
+    <artifact name="${ivy.artifact.id}" type="jar" conf="default" />
+    <artifact name="${package.id}" type="zip" conf="zip" />
+  </publications>
+
+  <dependencies defaultconf="default->default">
+
+    <dependency org="pentaho-kettle" name="kettle-core" rev="${dependency.kettle.revision}" transitive="false" changing="true" conf="provided->default"/>
+
+    <dependency org="pentaho" name="metastore" rev="${dependency.metastore.revision}" changing="true" transitive="false" conf="provided->default"/>
+    
+    <dependency org="redis.clients" name="jedis" rev="${dependency.jedis.revision}" transitive="false" />
+  </dependencies>
+</ivy-module>
