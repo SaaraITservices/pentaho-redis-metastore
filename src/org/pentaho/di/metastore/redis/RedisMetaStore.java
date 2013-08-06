@@ -239,8 +239,7 @@ public class RedisMetaStore extends BaseMetaStore implements IMetaStore {
 
   @Override
   public List<String> getElementIds(String namespace, IMetaStoreElementType elementType) throws MetaStoreException {
-    // TODO Auto-generated method stub
-    return null;
+    return new ArrayList<String>(jedis.smembers(RedisMetaStoreUtils.getKeyForElements(namespace,(RedisMetaStoreElementType)elementType)));
   }
 
   @Override
@@ -274,16 +273,15 @@ public class RedisMetaStore extends BaseMetaStore implements IMetaStore {
 
   @Override
   public List<String> getElementTypeIds(String namespace) throws MetaStoreException {
-    ArrayList<String> elementTypeIds = null;
-    /*List<IMetaStoreElementType> elementTypes = getElementTypes(namespace);
+    /*ArrayList<String> elementTypeIds = null;
+    List<IMetaStoreElementType> elementTypes = getElementTypes(namespace);
     if(elementTypes != null) {
       elementTypeIds = new ArrayList<String>(elementTypes.size());          
       for(IMetaStoreElementType elementType : elementTypes) {
         elementTypeIds.add(elementType.getId());
       }
     }*/
-    elementTypeIds = new ArrayList<String>(jedis.smembers(RedisMetaStoreUtils.getKeyForElementTypes(namespace)));
-    return elementTypeIds;
+    return new ArrayList<String>(jedis.smembers(RedisMetaStoreUtils.getKeyForElementTypes(namespace)));
   }
 
   @Override
@@ -301,8 +299,15 @@ public class RedisMetaStore extends BaseMetaStore implements IMetaStore {
 
   @Override
   public List<IMetaStoreElement> getElements(String namespace, IMetaStoreElementType elementType) throws MetaStoreException {
-    // TODO Auto-generated method stub
-    return null;
+    List<IMetaStoreElement> elements = null;
+    List<String> elementIds = getElementIds(namespace, elementType);
+    if(elementIds != null) {
+      elements = new ArrayList<IMetaStoreElement>(elementIds.size());
+      for(String elementTypeId : elementIds) {
+        elements.add(getElement(namespace, elementType, elementTypeId));
+      }
+    }
+    return elements;
   }
 
   @Override
@@ -326,15 +331,17 @@ public class RedisMetaStore extends BaseMetaStore implements IMetaStore {
   }
 
   @Override
-  public IMetaStoreElement newElement(IMetaStoreElementType elementType, String arg1, Object arg2) throws MetaStoreException {
-    // TODO Auto-generated method stub
-    return null;
+  public IMetaStoreElement newElement(IMetaStoreElementType elementType, String elementId, Object value) throws MetaStoreException {
+    RedisMetaStoreElement element = new RedisMetaStoreElement();
+    element.setElementType(elementType);
+    element.setId(elementId);
+    element.setValue(value);
+    return element;
   }
 
   @Override
-  public IMetaStoreElementOwner newElementOwner(String arg0, MetaStoreElementOwnerType arg1) throws MetaStoreException {
-    // TODO Auto-generated method stub
-    return null;
+  public IMetaStoreElementOwner newElementOwner(String name, MetaStoreElementOwnerType elementOwnerType) throws MetaStoreException {
+    return new RedisMetaStoreElementOwner(name, elementOwnerType);
   }
 
   @Override
